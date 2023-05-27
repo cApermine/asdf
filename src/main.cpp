@@ -1,9 +1,9 @@
 #include "main.h"
 
-	Motor left_mtr1(-11,1);
-	Motor left_mtr2(-12,1);
-	Motor left_mtr3(-13,1);
-	Motor left_mtr4(-14,1);
+	Motor left_mtr1(11,1);
+	Motor left_mtr2(12,1);
+	Motor left_mtr3(13,1);
+	Motor left_mtr4(14,1);
 	Motor right_mtr1(17);	
 	Motor right_mtr2(18);	
 	Motor right_mtr3(19);	
@@ -20,10 +20,70 @@ right_mtr3 = powerforward - powerturning;
 right_mtr4 = powerforward - powerturning;
 }
 
-void thetime(int time){
 
-	
+
+void thetime(int time, int direction)	{
+
+	int starttime = millis();
+
+	while(time > (millis() - starttime)){
+		Powerdrive(127*direction ,0);
+
+	}
+	Powerdrive(0,0);
+
 }
+
+void timeturning(int time, int direction)	{
+
+	int starttime = millis();
+
+	while(time > (millis() - starttime)){
+		Powerdrive(0,50*direction);
+
+	}
+	Powerdrive(0,0);
+
+}
+   
+double distance(int inches){
+
+	double internal, external, diameter, PI;
+
+		internal = 300;
+		external = (double)3/5;
+		diameter = 3.25;
+		PI = 3.141;
+
+return (inches*internal*external/diameter*PI);
+
+}
+
+void PIDdrive(int inches, double kP, double kI, double kD){
+
+	int power, intergral, past_error;
+	double derivative, error, target;
+	// target = distance(inches);
+	target = inches;
+		while(abs(target-left_mtr1.tare_position()) > 2 ){
+
+		past_error = error;
+		error = target-left_mtr1.tare_position();
+		derivative = error - past_error;
+
+		if(abs(target - left_mtr1.tare_position()) < 10 ){
+		intergral += error;
+	}
+	power = error*kP + intergral*kI + derivative*kD;
+	Powerdrive(power, 0);
+
+	}
+
+	Powerdrive(0, 0);
+
+}
+
+
 
 
 /**
@@ -73,12 +133,17 @@ void autonomous() {}
 void opcontrol() {
 	Controller master(pros::E_CONTROLLER_MASTER);
 
+	PIDdrive(1000, 0.5, 0, 0);
+
+
 
 	while (true) {
 		int yaxis = master.get_analog(ANALOG_LEFT_Y);
 		int xaxis = master.get_analog(ANALOG_LEFT_X);
 
 		Powerdrive(yaxis, xaxis);
+
+
 
 		pros::delay(20);
 	}
