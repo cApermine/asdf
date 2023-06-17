@@ -1,5 +1,5 @@
 #include "main.h"
-
+//different motors and their port numbers
 	Motor left_mtr1(11,1);
 	Motor left_mtr2(12,1);
 	Motor left_mtr3(13,1);
@@ -8,84 +8,15 @@
 	Motor right_mtr2(18);	
 	Motor right_mtr3(19);	
 	Motor right_mtr4(20);	
-
-void Powerdrive(int powerforward, int powerturning){
-left_mtr1 = powerforward + powerturning;
-left_mtr2 = powerforward + powerturning;
-left_mtr3 = powerforward + powerturning;
-left_mtr4 = powerforward + powerturning;
-right_mtr1 = powerforward - powerturning;
-right_mtr2 = powerforward - powerturning;
-right_mtr3 = powerforward - powerturning;
-right_mtr4 = powerforward - powerturning;
-}
+	IMU imu(21);
 
 
 
-void thetime(int time, int direction)	{
-
-	int starttime = millis();
-
-	while(time > (millis() - starttime)){
-		Powerdrive(127*direction ,0);
-
-	}
-	Powerdrive(0,0);
+void initialize() {
+	delay(500);
+	imu.reset();
 
 }
-
-void timeturning(int time, int direction)	{
-
-	int starttime = millis();
-
-	while(time > (millis() - starttime)){
-		Powerdrive(0,50*direction);
-
-	}
-	Powerdrive(0,0);
-
-}
-   
-double distance(int inches){
-
-	double internal, external, diameter, PI;
-
-		internal = 300;
-		external = (double)3/5;
-		diameter = 3.25;
-		PI = 3.141;
-
-return (inches*internal*external/diameter*PI);
-
-}
-
-void PIDdrive(int inches, double kP, double kI, double kD){
-
-	int power, intergral, past_error;
-	double derivative, error, target;
-	// target = distance(inches);
-	target = inches;
-		while(abs(target-left_mtr1.tare_position()) > 2 ){
-
-		past_error = error;
-		error = target-left_mtr1.tare_position();
-		derivative = error - past_error;
-
-		if(abs(target - left_mtr1.tare_position()) < 10 ){
-		intergral += error;
-	}
-	power = error*kP + intergral*kI + derivative*kD;
-	Powerdrive(power, 0);
-
-	}
-
-	Powerdrive(0, 0);
-
-}
-
-
-
-
 /**
  * Runs while the robot is in the disabled state of Field Management System or
  * the VEX Competition Switch, following either autonomous or opcontrol. When
@@ -115,7 +46,11 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+DriveStraight(10, 1, 0, 0);
+PIDturn(90,1,0,0);
+}
+
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -132,18 +67,27 @@ void autonomous() {}
  */
 void opcontrol() {
 	Controller master(pros::E_CONTROLLER_MASTER);
+	// brake();
 
-	PIDdrive(1000, 0.5, 0, 0);
-
-
-
+//displays the temperature of each motor on the brain
 	while (true) {
+		screen::print(TEXT_MEDIUM, 1, "Left Temp: %f", left_mtr1.get_temperature());
+		screen::print(TEXT_MEDIUM, 2, "Left Temp: %f", left_mtr2.get_temperature());
+		screen::print(TEXT_MEDIUM, 3, "Left Temp: %f", left_mtr3.get_temperature());
+		screen::print(TEXT_MEDIUM, 4, "Left Temp: %f", left_mtr4.get_temperature());
+		screen::print(TEXT_MEDIUM, 5, "Right Temp: %f", right_mtr1.get_temperature());
+		screen::print(TEXT_MEDIUM, 6, "Right Temp: %f", right_mtr2.get_temperature());
+		screen::print(TEXT_MEDIUM, 7, "Right Temp: %f", right_mtr3.get_temperature());
+		screen::print(TEXT_MEDIUM, 8, "Right Temp: %f", right_mtr4.get_temperature());
+
+
+
+		screen::print(TEXT_MEDIUM, 9, "distance output: %f", left_mtr1.get_position());
+			
 		int yaxis = master.get_analog(ANALOG_LEFT_Y);
 		int xaxis = master.get_analog(ANALOG_LEFT_X);
 
 		Powerdrive(yaxis, xaxis);
-
-
 
 		pros::delay(20);
 	}

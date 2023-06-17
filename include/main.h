@@ -35,6 +35,7 @@
 #define PROS_USE_LITERALS
 
 #include "api.h"
+#include "function.h"
 
 /**
  * You should add more #includes here
@@ -76,6 +77,17 @@ void opcontrol(void);
  * You can add C++-only headers here
  */
 //#include <iostream>
+
 #endif
 
 #endif  // _PROS_MAIN_H_
+
+	extern Motor left_mtr1;
+	extern Motor left_mtr2;
+	extern Motor left_mtr3;
+	extern Motor left_mtr4;
+	extern Motor right_mtr1;
+	extern Motor right_mtr2;
+	extern Motor right_mtr3;
+	extern Motor right_mtr4;
+	extern IMU imu;
