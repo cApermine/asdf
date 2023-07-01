@@ -1,5 +1,16 @@
 #include "main.h"
 
+ void resetMotors(){
+	left_mtr1.tare_postion();
+	left_mtr2.tare_postion();
+	left_mtr3.tare_postion(); 
+	left_mtr4.tare_postion();
+	right_mtr1.tare_postion(); 
+	right_mtr2.tare_postion(); 
+	right_mtr3.tare_postion(); 
+	right_mtr4.tare_postion(); 	
+ }
+
 //shows how motors will drive forward and turn
 void Powerdrive(int powerforward, int powerturning){
 left_mtr1 = powerforward + powerturning;
